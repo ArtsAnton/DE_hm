@@ -18,6 +18,7 @@ object BostonCrimesMap extends App {
     .option("header", value = true)
     .option("inferSchema", value = true)
     .csv(args(0))
+    .na.fill("no_name", Seq("DISTRICT"))
 
   val codes = broadcast(spark
     .read
@@ -35,6 +36,7 @@ object BostonCrimesMap extends App {
     "SELECT DISTRICT as Dist, COUNT(INCIDENT_NUMBER) as crimes_total, AVG(Lat) as lat, AVG(Long) as lng " +
       "FROM crime GROUP BY Dist"
   )
+
   // рвсчет медианы
   val crimes_monthly = spark.sql(
     "SELECT DISTRICT as dist, APPROX_PERCENTILE(INCIDENT, 0.5) as crimes_monthly " +
@@ -43,7 +45,7 @@ object BostonCrimesMap extends App {
 
   //Поиск 3-х наиболее частых видов преступлений по районам
   val crime_type_df = spark.sql(
-    "SELECT INC.DISTRICT, INC.crime_type " +
+    "SELECT DISTRICT, crime_type " +
       "FROM (SELECT DISTRICT, crime_type, COUNT(*) as INCIDENT, " +
       "row_number() OVER(PARTITION BY DISTRICT ORDER BY COUNT(*) DESC) pos FROM crime JOIN codes " +
       "ON crime.OFFENSE_CODE=codes.CODE  GROUP BY DISTRICT, crime_type) AS INC WHERE pos<4"

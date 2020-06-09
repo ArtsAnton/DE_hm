@@ -3,13 +3,13 @@ from kafka import KafkaProducer
 from json import dumps
 
 
-parameter = ['time', 'total_ECCS_imf', 'flow_rate_loop_1', 'flow_rate_loop_2',
-             'flow_rate_loop_2', 'water_level_1', 'water_level_2', 'water_level_3', 'coolant_mass_loop_1',
-             'coolant_mass_loop_2', 'coolant_mass_loop_3', 'Reactivity', 'PRZ_water_level_(m)', 'total_heat_power_2',
-             'saturation_temperature', 'total_power', 'total_ECCS_imf', 'pump_velocity_loop_1', 'pump_velocity_loop_2',
-             'pump_velocity_loop_3', 'Pressure', 'cladding_temperature_1', 'cladding_temperature_2',
+parameter = ['time', 'total_eccs_imf', 'flow_rate_loop_1', 'flow_rate_loop_2',
+             'flow_rate_loop_3', 'water_level_1', 'water_level_2', 'water_level_3', 'coolant_mass_loop_1',
+             'coolant_mass_loop_2', 'coolant_mass_loop_3', 'reactivity', 'prz_water_level', 'total_heat_power_2',
+             'saturation_temperature', 'total_power', 'pump_velocity_loop_1', 'pump_velocity_loop_2',
+             'pump_velocity_loop_3', 'pressure', 'cladding_temperature_1', 'cladding_temperature_2',
              'cladding_temperature_3', 'fuel_temperature_1', 'fuel_temperature_2', 'fuel_temperature_3',
-             'secondary_side_pressure', 'rate_flow_break', 'BRU_A_flow_rate_loop_1', 'BRU_A_flow_rate_loop_3',
+             'secondary_side_pressure', 'rate_flow_break', 'bru_a_flow_rate_loop_1', 'bru_a_flow_rate_loop_3',
              'core_coolant_flow_rate']
 
 

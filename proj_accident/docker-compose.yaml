@@ -24,3 +24,18 @@ services:
       KAFKA_CREATE_TOPICS: "input_data_message"
     volumes:
      - /var/run/docker.sock:/var/run/docker.sock
+  clickhouse-server:
+    image: yandex/clickhouse-server
+    ports:
+      - 8123:8123
+      - 9000:9000
+    depends_on:
+      - kafka
+    links: 
+      - kafka
+  clickhouse-client:
+    image: yandex/clickhouse-client
+    entrypoint:
+      - /bin/sleep
+    command:
+      - infinity

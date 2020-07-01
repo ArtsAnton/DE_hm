@@ -9,14 +9,14 @@
 - [Grafana;](https://grafana.com/)
 - [ClickHouse datasource for Grafana;](https://github.com/Vertamedia/clickhouse-grafana)
 - [Python;](https://www.python.org/)
-- [Smoothie.js](http://smoothiecharts.org/)
+- [Smoothie.js.](http://smoothiecharts.org/)
 ## Модули Pytnon
 - [Clickhouse-driver;](https://clickhouse-driver.readthedocs.io/en/latest/index.html)
 - [Pykafka;](https://pykafka.readthedocs.io/en/latest/index.html)
-- [Kafka-python;](https://kafka-python.readthedocs.io/en/master/index.html)
+- [Kafka-python.](https://kafka-python.readthedocs.io/en/master/index.html)
 ## Структура проекта
-- [app.py;](https://github.com/ArtsAnton/DE_hm/blob/master/proj_accident/python/app.py) - Flask приложение для визуализации графиков аварийного процесса в real-time. Читает данные из соответствующего топика Kafka;
-- [consumer.py;](https://github.com/ArtsAnton/DE_hm/blob/master/proj_accident/python/consumer.py) - Пишет данные в Ckickhouse. Данные читает из соответствующего топика Kafka;
-- [producer.py;](https://github.com/ArtsAnton/DE_hm/blob/master/proj_accident/python/producer.py) - Создает два топика в Kafka и отправляет сообщения для  app.py и consumer.py; 
-- [start.py;](https://github.com/ArtsAnton/DE_hm/blob/master/proj_accident/start.py) - Запуск проекта (1. Запускает Docker 2. Добавляет в Kafka топики для Clickhouse и flask приложения 3. Запускает producer.py, app.py, consumer.py. 4. Открывает в окнах браузера Flask приложение (app.py) и Grafana;   
-- [stop.py.](https://github.com/ArtsAnton/DE_hm/blob/master/proj_accident/stop.py) - Отстанавливает Flsak приложение (app.py) (producer.py) (consumer.py).
+- [app.py](https://github.com/ArtsAnton/DE_hm/blob/master/proj_accident/python/app.py) - Flask приложение для визуализации графиков аварийного процесса в real-time. Читает данные из соответствующего топика Kafka;
+- [consumer.py](https://github.com/ArtsAnton/DE_hm/blob/master/proj_accident/python/consumer.py) - пишет данные в Ckickhouse. Данные читает из соответствующего топика Kafka;
+- [producer.py](https://github.com/ArtsAnton/DE_hm/blob/master/proj_accident/python/producer.py) - создает два топика в Kafka и отправляет сообщения для  app.py и consumer.py; 
+- [start.py](https://github.com/ArtsAnton/DE_hm/blob/master/proj_accident/start.py) - запускает проект (1. Запускает Docker 2. Добавляет в Kafka топики для Clickhouse и flask приложения 3. Запускает producer.py, app.py, consumer.py. 4. Открывает в окнах браузера Flask приложение (app.py) и Grafana;   
+- [stop.py](https://github.com/ArtsAnton/DE_hm/blob/master/proj_accident/stop.py) - останавливает app.py,roducer.py, consumer.py.

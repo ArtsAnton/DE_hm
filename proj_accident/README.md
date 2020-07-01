@@ -1,6 +1,9 @@
 # Финальный проект [Otus DE](https://otus.ru/lessons/data-engineer/?int_source=courses_catalog&int_term=data-science)
-## Крактая постановка задачи
+## Назанчение проекта
+Анализ состояния энергетического объекта (сбор и хранение информации теплогидравлических параметров системы в элементах оборудования)
 ## Данные
+Используемые в проетке данные представляют собой набор теплогидравлических параметров описывающих аварийный процес на энергетическом объекте.
+Данные получены с помощью теплогидравлического кода [relap5 mod 3.2](https://en.wikipedia.org/wiki/RELAP5-3D).
 ## Технологии
 - [Docker;](https://www.docker.com/)
 - [Apache Kafka;](https://kafka.apache.org/)
@@ -19,4 +22,4 @@
 - [consumer.py](https://github.com/ArtsAnton/DE_hm/blob/master/proj_accident/python/consumer.py) - пишет данные в Ckickhouse. Данные читает из соответствующего топика Kafka;
 - [producer.py](https://github.com/ArtsAnton/DE_hm/blob/master/proj_accident/python/producer.py) - создает два топика в Kafka и отправляет сообщения для  app.py и consumer.py; 
 - [start.py](https://github.com/ArtsAnton/DE_hm/blob/master/proj_accident/start.py) - запускает проект (1. Запускает Docker 2. Добавляет в Kafka топики для Clickhouse и flask приложения 3. Запускает producer.py, app.py, consumer.py. 4. Открывает в окнах браузера Flask приложение (app.py) и Grafana;   
-- [stop.py](https://github.com/ArtsAnton/DE_hm/blob/master/proj_accident/stop.py) - останавливает app.py,roducer.py, consumer.py.
+- [stop.py](https://github.com/ArtsAnton/DE_hm/blob/master/proj_accident/stop.py) - останавливает app.py, roducer.py, consumer.py.

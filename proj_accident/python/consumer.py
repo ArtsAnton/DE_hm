@@ -1,14 +1,30 @@
-from kafka import KafkaConsumer
 from json import loads
-from clickhouse_driver import Client
+from clickhouse_driver import connect
+from pykafka import KafkaClient
 
 
-client = Client(host='localhost', port=9000)
-client.execute('CREATE DATABASE IF NOT EXISTS parameter')
-client.execute('USE parameter')
-client.execute("DROP TABLE IF EXISTS parameter.param")
-client.execute(
-    'CREATE TABLE IF NOT EXISTS parameter.param ('
+def get_kafka_client():
+    return KafkaClient(hosts='127.0.0.1:9092')
+
+
+parameter = ['time', 'total_eccs_imf', 'flow_rate_loop_1', 'flow_rate_loop_2',
+             'flow_rate_loop_3', 'water_level_1', 'water_level_2', 'water_level_3', 'coolant_mass_loop_1',
+             'coolant_mass_loop_2', 'coolant_mass_loop_3', 'reactivity', 'prz_water_level', 'total_heat_power_2',
+             'saturation_temperature', 'total_power', 'pump_velocity_loop_1', 'pump_velocity_loop_2',
+             'pump_velocity_loop_3', 'pressure', 'cladding_temperature_1', 'cladding_temperature_2',
+             'cladding_temperature_3', 'fuel_temperature_1', 'fuel_temperature_2', 'fuel_temperature_3',
+             'secondary_side_pressure', 'rate_flow_break', 'bru_a_flow_rate_loop_1', 'bru_a_flow_rate_loop_3',
+             'core_coolant_flow_rate']
+
+
+connect = connect('clickhouse://localhost')
+cursor = connect.cursor()
+cursor.execute('CREATE DATABASE IF NOT EXISTS parameter')
+cursor.execute('USE parameter')
+cursor.execute('DROP TABLE IF EXISTS param')
+
+cursor.execute(
+    'CREATE TABLE IF NOT EXISTS param ('
     'time Float32,'
     'total_eccs_imf Float32,'
     'flow_rate_loop_1 Float32,'
@@ -44,15 +60,14 @@ client.execute(
 )
 
 
-consumer = KafkaConsumer(
-    'input_data_message',
-    auto_offset_reset='earliest',
-    enable_auto_commit=True,
-    group_id='my-group-1',
-    value_deserializer=lambda m: loads(m.decode('utf-8')),
-    bootstrap_servers='localhost:9092')
+client = get_kafka_client()
+topic = client.topics['clickhouse1']
 
-
-for m in consumer:
-    client.execute('INSERT INTO parameter.param VALUES  (%s)' % ', '.join(list(map(str, m.value.values()))))
+test = []
+for m in topic.get_simple_consumer():
+    test.append(loads(m.value.decode()))
+    if len(test) == 20:
+        cursor.executemany('INSERT INTO param ({}) VALUES'.format(', '.join(parameter)), test)
+        connect.commit()
+        test = []
 

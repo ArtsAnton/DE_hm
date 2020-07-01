@@ -1,5 +1,5 @@
 import time
-from kafka import KafkaProducer
+from kafka import KafkaProducer, KafkaClient
 from json import dumps
 
 
@@ -27,13 +27,19 @@ def generator(file_name="transform_data/data.csv"):
             try:
                 line = list(map(float, text.readline().split(",")))
                 if float(round(line[0], 1)) == 0:
-                    producer.send('input_data_message', value=message(parameter, line))
+                    producer.send('dashboard1', value=message(parameter, line))
+                    producer.send('clickhouse1', value=message(parameter, line))
                 else:
-                    time.sleep((line[0] - prev_step))
-                    producer.send('input_data_message', value=message(parameter, line))
+                    time.sleep((line[0] - prev_step)/10)
+                    producer.send('dashboard1', value=message(parameter, line))
+                    producer.send('clickhouse1', value=message(parameter, line))
             except ValueError:
                 break
 
 
-generator()
-
+if __name__ == '__main__':
+    client = KafkaClient(bootstrap_servers='localhost:9092')
+    client.add_topic('dashboard1')
+    client.add_topic('clickhouse1')
+    client.close()
+    generator()

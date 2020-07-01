@@ -3,12 +3,12 @@ version: '3'
 services:
   zookeeper:
     image: wurstmeister/zookeeper
-    container_name: zookeeper
+    container_name: zookeeper1
     ports:
      - "2181:2181"
   kafka:
     image: wurstmeister/kafka
-    container_name: kafka
+    container_name: kafka1
     links:
       - zookeeper
     ports:
@@ -21,12 +21,11 @@ services:
       KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: "input_data_message"
     volumes:
      - /var/run/docker.sock:/var/run/docker.sock
   clickhouse-server:
     image: yandex/clickhouse-server
-    container_name: clickhouse-server
+    container_name: clickhouse-server1
     ports:
       - 8123:8123
       - 9000:9000
@@ -36,23 +35,13 @@ services:
       - kafka
   clickhouse-client:
     image: yandex/clickhouse-client
-    container_name: clickhouse-client
+    container_name: clickhouse-client1
     entrypoint:
       - /bin/sleep
     command:
       - infinity
-  graphite:
-    image: sitespeedio/graphite
-    container_name: graphite
-    ports:
-      - "2003:2003"
-      - "2004:2004"
-      - "8080:80"
   grafana:
     image: grafana/grafana
-    container_name: grafana
+    container_name: grafana1
     ports:
       - 3000:3000/tcp
-    links:
-      - graphite
-

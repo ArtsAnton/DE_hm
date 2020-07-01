@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <title>Dashboard</title>
+</head>
+<body>
+
+    <script src="{{ url_for('static', filename='smoothie.js') }}"></script>
+
+
+<div class="container-fluid">
+  <div class="row">
+    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+      <div class="sidebar-sticky pt-3">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link active" href="#">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+              Dashboard <span class="sr-only">(current)</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4"><div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"><div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div></div><div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:200%;height:200%;left:0; top:0"></div></div></div>
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Dashboard</h1>
+      </div>
+
+      <p id="current_pressure"></p>
+      <canvas id="mycanvas1" width="1500" height="300"></canvas>
+
+      <p id="current_power"></p>
+      <canvas id="mycanvas2" width="1500" height="300"></canvas>
+
+      <p id="current_water_level_1"></p>
+      <p id="current_water_level_2"></p>
+      <p id="current_water_level_3"></p>
+      <canvas id="mycanvas3" width="1500" height="300"></canvas>
+
+      <p id="current_cladding_temperature_1"></p>
+      <p id="current_cladding_temperature_2"></p>
+      <p id="current_cladding_temperature_3"></p>
+      <canvas id="mycanvas4" width="1500" height="300"></canvas>
+
+      <p id="current_reactivity"></p>
+      <canvas id="mycanvas5" width="1500" height="300"></canvas>
+
+      <p id="current_fuel_temperature_1"></p>
+      <p id="current_fuel_temperature_2"></p>
+      <p id="current_fuel_temperature_3"></p>
+      <canvas id="mycanvas6" width="1500" height="300"></canvas>
+
+      <script>
+      var line1 = new TimeSeries();
+
+      var line2 = new TimeSeries();
+
+      var line3_1 = new TimeSeries();
+      var line3_2 = new TimeSeries();
+      var line3_3 = new TimeSeries();
+
+      var line4_1 = new TimeSeries();
+      var line4_2 = new TimeSeries();
+      var line4_3 = new TimeSeries();
+
+      var line5 = new TimeSeries();
+
+      var line6_1 = new TimeSeries();
+      var line6_2 = new TimeSeries();
+      var line6_3 = new TimeSeries();
+
+      var source = new EventSource('/topic/dashboard1');
+      source.addEventListener('message', function(e){
+        obj = JSON.parse(e.data);
+        document.getElementById('current_pressure').textContent='Current pressure: ' + (obj['pressure']/1000).toFixed(3) + ' kPa;';
+
+        document.getElementById('current_power').textContent='Current reactor power: ' + (obj['total_power']/1000000).toFixed(3) + ' MW;';
+
+        document.getElementById('current_water_level_1').textContent='Current water level (flooded): ' + obj['water_level_1'].toFixed(3) + ' m;';
+        document.getElementById('current_water_level_2').textContent='Current water level (hot assembly): ' + obj['water_level_2'].toFixed(3) + ' m;';
+        document.getElementById('current_water_level_3').textContent='Current water level (non-flooded): ' + obj['water_level_3'].toFixed(3) + ' m;';
+
+        document.getElementById('current_cladding_temperature_1').textContent='Current cladding temperature (flooded): ' + obj['cladding_temperature_1'].toFixed(1) + ' K;';
+        document.getElementById('current_cladding_temperature_2').textContent='Current cladding temperature (hot assembly): ' + obj['cladding_temperature_2'].toFixed(1) + ' K;';
+        document.getElementById('current_cladding_temperature_3').textContent='Current cladding temperature (non-flooded): ' + obj['cladding_temperature_3'].toFixed(1) + ' K;';
+
+        document.getElementById('current_reactivity').textContent='Current reactivity: ' + obj['reactivity'].toFixed(2) + ' $;';
+
+        document.getElementById('current_fuel_temperature_1').textContent='Current fuel temperature (flooded): ' + obj['fuel_temperature_1'].toFixed(1) + ' K;';
+        document.getElementById('current_fuel_temperature_2').textContent='Current fuel temperature (hot assembly): ' + obj['fuel_temperature_2'].toFixed(1) + ' K;';
+        document.getElementById('current_fuel_temperature_3').textContent='Current fuel temperature (non-flooded): ' + obj['fuel_temperature_3'].toFixed(1) + ' K;';
+
+      }, false);
+
+      var smoothie1 = new SmoothieChart({millisPerPixel:100, grid:{verticalSections:15}, labels:{fontSize:15}, timestampFormatter: SmoothieChart.timeFormatter, maxValue:15000, minValue: 0});
+        smoothie1.streamTo(document.getElementById("mycanvas1"));
+        setInterval(function() {line1.append(new Date().getTime(), obj['pressure']/1000 )});
+        smoothie1.addTimeSeries(line1, {lineWidth:2, fillStyle:'rgba(7%, 38%, 95%, 0.4)', strokeStyle: '#0300ff'});
+        smoothie1.streamTo(document.getElementById("mycanvas1"), 150);
+
+      var smoothie2 = new SmoothieChart({millisPerPixel:100, grid:{verticalSections:15}, labels:{fontSize:15}, timestampFormatter: SmoothieChart.timeFormatter,  maxValue:1500, minValue: 0});
+        smoothie2.streamTo(document.getElementById("mycanvas2"));
+        setInterval(function() {line2.append(new Date().getTime(), (obj['total_power']/1000000).toFixed(3) )});
+        smoothie2.addTimeSeries(line2, {lineWidth:2, fillStyle:'rgba(81%, 4%, 17%, 0.4)', strokeStyle:'#ff0000'});
+        smoothie2.streamTo(document.getElementById("mycanvas2"), 150);
+
+      var smoothie3 = new SmoothieChart({millisPerPixel:100, grid:{verticalSections:6}, labels:{fontSize:15}, timestampFormatter: SmoothieChart.timeFormatter,  maxValue:3, minValue: 0});
+        smoothie3.streamTo(document.getElementById("mycanvas3"));
+        setInterval(function() {
+          line3_1.append(new Date().getTime(), (obj['water_level_1']).toFixed(3));
+          line3_2.append(new Date().getTime(), (obj['water_level_2']).toFixed(3));
+          line3_3.append(new Date().getTime(), (obj['water_level_3']).toFixed(3));
+        });
+        smoothie3.addTimeSeries(line3_1, {lineWidth:2, strokeStyle: '#0bf0e5'});
+        smoothie3.addTimeSeries(line3_2, {lineWidth:2, strokeStyle: '#f0ee0b'});
+        smoothie3.addTimeSeries(line3_3, {lineWidth:2, strokeStyle: '#14f00b'});
+        smoothie3.streamTo(document.getElementById("mycanvas3"), 150);
+
+      var smoothie4 = new SmoothieChart({millisPerPixel:100, grid:{verticalSections:13}, labels:{fontSize:15}, timestampFormatter: SmoothieChart.timeFormatter,  maxValue:650, minValue: 0});
+        smoothie4.streamTo(document.getElementById("mycanvas3"));
+        setInterval(function() {
+          line4_1.append(new Date().getTime(), (obj['cladding_temperature_1']).toFixed(1));
+          line4_2.append(new Date().getTime(), (obj['cladding_temperature_2']).toFixed(1));
+          line4_3.append(new Date().getTime(), (obj['cladding_temperature_3']).toFixed(1));
+        });
+        smoothie4.addTimeSeries(line4_1, {lineWidth:2, strokeStyle: '#0bf0e5'});
+        smoothie4.addTimeSeries(line4_2, {lineWidth:2, strokeStyle: '#f0ee0b'});
+        smoothie4.addTimeSeries(line4_3, {lineWidth:2, strokeStyle: '#14f00b'});
+        smoothie4.streamTo(document.getElementById("mycanvas4"), 150);
+
+      var smoothie5 = new SmoothieChart({millisPerPixel:100, grid:{verticalSections:6}, labels:{fontSize:15}, timestampFormatter: SmoothieChart.timeFormatter, maxValue:0, minValue: -30});
+        smoothie5.streamTo(document.getElementById("mycanvas5"));
+        setInterval(function() {line5.append(new Date().getTime(), obj['reactivity'] )});
+        smoothie5.addTimeSeries(line5, {lineWidth:2, strokeStyle: '#0300ff'});
+        smoothie5.streamTo(document.getElementById("mycanvas5"), 150);
+
+      var smoothie6 = new SmoothieChart({millisPerPixel:100, grid:{verticalSections:7}, labels:{fontSize:15}, timestampFormatter: SmoothieChart.timeFormatter,  maxValue:1750, minValue: 0});
+        smoothie6.streamTo(document.getElementById("mycanvas6"));
+        setInterval(function() {
+          line6_1.append(new Date().getTime(), (obj['fuel_temperature_1']).toFixed(1));
+          line6_2.append(new Date().getTime(), (obj['fuel_temperature_2']).toFixed(1));
+          line6_3.append(new Date().getTime(), (obj['fuel_temperature_3']).toFixed(1));
+        });
+        smoothie6.addTimeSeries(line6_1, {lineWidth:2, strokeStyle: '#0bf0e5'});
+        smoothie6.addTimeSeries(line6_2, {lineWidth:2, strokeStyle: '#f0ee0b'});
+        smoothie6.addTimeSeries(line6_3, {lineWidth:2, strokeStyle: '#14f00b'});
+        smoothie6.streamTo(document.getElementById("mycanvas6"), 150);
+      </script>
+
+    </main>
+  </div>
+</div>
+
+</body>
+</html>
